@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
+evmap = "10.0.2"
 
