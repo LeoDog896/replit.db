@@ -1,6 +1,7 @@
 use actix_storage::Storage;
 use actix_storage_hashmap::HashMapStore;
 use actix_web::{error, Error, delete, get, post, web, App, HttpResponse, HttpServer, Responder};
+use serde::Deserialize;
 
 #[get("/{key}")]
 async fn get(storage: Storage, path: web::Path<(String,)>) -> Result<impl Responder, Error> {
@@ -35,6 +36,20 @@ async fn add(storage: Storage, req_body: String) -> Result<impl Responder, Error
     Ok(HttpResponse::Ok())
 }
 
+#[derive(Deserialize)]
+struct Info {
+    prefix: String,
+}
+
+#[get("/")]
+async fn search(storage: Storage, info: web::Query<Info>) -> Result<impl Responder, Error> {
+    if info.prefix.is_empty() {
+        // TODO iter keys (https://github.com/pooyamb/actix-storage/issues/8)
+        return Ok(HttpResponse::Ok())
+    }
+    Ok(HttpResponse::Ok())
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let store = HashMapStore::new();
@@ -47,6 +62,7 @@ async fn main() -> std::io::Result<()> {
             .service(get)
             .service(del)
             .service(add)
+            .service(search)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
